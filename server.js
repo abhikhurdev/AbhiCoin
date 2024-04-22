@@ -4,7 +4,7 @@ const express = require("express");
 const session = require("express-session");
 const passport = require("passport");
 const LocalStrategy = require("passport-local").Strategy;
-const sequelize = require("./config/database");
+const bcrypt = require("bcrypt");
 const User = require("./models/user");
 const authRoutes = require("./routes/auth");
 const indexRoutes = require("./routes/index");
@@ -23,6 +23,7 @@ app.use(
 );
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(express.static("public")); // Serve static files from the 'public' directory
 
 // Passport configuration
 passport.use(
@@ -57,8 +58,6 @@ passport.deserializeUser(async (id, done) => {
 app.use("/", indexRoutes);
 app.use("/auth", authRoutes);
 
-// Sync database and start server
-sequelize.sync().then(() => {
-  const PORT = process.env.PORT || 3000;
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-});
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
